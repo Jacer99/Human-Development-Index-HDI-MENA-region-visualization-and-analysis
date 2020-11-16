@@ -1,0 +1,214 @@
+---
+title: "Human Development Index (HDI)
+MENA region visualization 
+and analysis"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  word_document: default
+---
+
+Treat the data 
+
+```{r}
+library(ggplot2)
+HDI=na.omit(read.csv2("Human Development Index (HDI).csv",sep=","))
+HDI[HDI == ".."] <- NA
+HDI=HDI[,-1]
+library(dplyr)
+
+countries=read.csv2("human-development-index-hdi-1 - human-development-index-hdi-1.csv",sep=",",stringsAsFactors = T)
+
+HDI[186,1]="Vietnam"
+HDI[29,1]="Cape Verde"
+t=levels(countries$country)
+HDI=HDI[which ((HDI$Country %in% t)),]
+HDI[HDI == ".."] <- NA
+
+for (i in 2:30) {
+  HDI[,i]=as.numeric(HDI[,i])
+}
+HDI=t(HDI)
+colnames(HDI)=HDI[1,]
+HDI=as.data.frame( HDI[-1,])
+for (i in 1:182) {
+  HDI[,i]=as.numeric(HDI[,i])
+}
+HDI$year=1990:2018
+library(reshape)
+HDI <- melt(HDI, id="year")
+```
+
+
+```{r}
+MENA=c("Turkey","Tunisia")
+mn=HDI[which(HDI$variable %in% MENA),]
+p = ggplot(mn, aes(x=year,y=value, group=variable)) +
+  geom_line(aes(colour = variable), size=1) +
+  geom_point(aes(colour = variable), size=2) +
+  
+  geom_hline(yintercept=0.550, linetype="dashed", color = "red")+
+  geom_hline(yintercept=0.7, linetype="dashed", color = "blue")+
+  geom_hline(yintercept=0.8, linetype="dashed", color = "green")+
+  geom_vline(xintercept=1993.75, color = "red")+
+  geom_vline(xintercept=2000, color = "red")+
+  geom_vline(xintercept=2005, color = "red",size=0.5)+
+
+  scale_x_continuous(breaks=seq(1980,2018,2))+
+  scale_y_continuous(breaks=seq(0.3,0.9,0.02))+
+  ggtitle('HDI index between Tunisia and Turkey')+
+  xlab("date year")+
+  ylab("yearly HDi")
+```
+
+```{r}
+p
+```
+
+
+```{r}
+MENA=c("Algeria","Bahrain", "Djibouti", "Egypt", "Iran (Islamic Republic of)", "Iraq", "Israel", "Jordan", "Kuwait", "Lebanon", "Libya", "Malta", "Morocco", "Oman", "Qatar", "Saudi Arabia", "Syrian Arab Republic", "Tunisia", "United Arab Emirates", "Yemen")
+
+mn=HDI[which(HDI$variable %in% MENA),]
+p = ggplot(mn, aes(x=year,y=value, group=variable)) +
+  geom_line(aes(colour = variable), size=1) +
+  geom_hline(yintercept=0.550, linetype="dashed", color = "red")+
+  geom_hline(yintercept=0.7, linetype="dashed", color = "blue")+
+  geom_hline(yintercept=0.8, linetype="dashed", color = "green")+
+  ggtitle('HDI index of MENA region')+
+  xlab("date year")+
+  ylab("yearly HDi")
+p
+```
+
+```{r}
+MENA=c("Tunisia")
+
+mn=HDI[which(HDI$variable %in% MENA),]
+p = ggplot(mn, aes(x=year,y=value, group=variable)) +
+  geom_line(aes(colour = variable), size=1) +
+  geom_hline(yintercept=0.550, linetype="dashed", color = "red")+
+  geom_hline(yintercept=0.7, linetype="dashed", color = "blue")+
+  geom_hline(yintercept=0.8, linetype="dashed", color = "green")+
+  ggtitle('HDI index of Tunisia')+
+  xlab("date year")+
+  ylab("yearly HDi")
+p
+```
+
+```{r}
+MENA=c("Algeria", "Iraq", "Tunisia")
+
+
+mn=HDI[which(HDI$variable %in% MENA),]
+p = ggplot(mn, aes(x=year,y=value, group=variable)) +
+  geom_line(aes(colour = variable), size=1) +
+  geom_hline(yintercept=0.550, linetype="dashed", color = "red")+
+  geom_hline(yintercept=0.7, linetype="dashed", color = "blue")+
+  geom_hline(yintercept=0.8, linetype="dashed", color = "green")+
+  ggtitle('HDI index of Tunisia')+
+  xlab("date year")+
+  ylab("yearly HDi")
+p
+
+```
+```{r}
+MENA=c("Turkey","Ecuador","Albania","Peru" ,"Thailand","Tunisia")
+
+
+mn=HDI[which(HDI$variable %in% MENA),]
+p = ggplot(mn, aes(x=year,y=value, group=variable)) +
+  geom_line(aes(colour = variable), size=1) +
+  geom_hline(yintercept=0.550, linetype="dashed", color = "red")+
+  geom_hline(yintercept=0.7, linetype="dashed", color = "blue")+
+  geom_hline(yintercept=0.8, linetype="dashed", color = "green")+
+  ggtitle('HDI index of Tunisia')+
+  xlab("date year")+
+  ylab("yearly HDi")
+p
+```
+```{r}
+f=c(" Tunisia"," Turkey","year")
+df=read.csv2("Life expectancy index.csv",sep=",")
+li=df[which(df$Country %in% f),]
+life_expectancy_index=li[,colSums(is.na(df))<nrow(df)]
+life_expectancy_index=as.data.frame(t(life_expectancy_index[,-1]))
+life_expectancy_index[,3]=c(1989:2018)
+colnames(life_expectancy_index)=c("Tunisia","Turkey","year")
+life_expectancy_index=life_expectancy_index[-1,]
+for(i in 1:3){
+life_expectancy_index[,i]=as.numeric(life_expectancy_index[,i])
+}
+
+
+df=read.csv2("Education index.csv",sep=",")
+li=df[which(df$Country %in% f),]
+education_index=li[,colSums(is.na(df))<nrow(df)]
+education_index=as.data.frame(t(education_index[,-1]))
+education_index[,3]=c(1989:2018)
+colnames(education_index)=c("Tunisia","Turkey","year")
+education_index=education_index[-1,]
+for(i in 1:3){
+education_index[,i]=as.numeric(education_index[,i])
+}
+
+df=read.csv2("Income index.csv",sep=",")
+li=df[which(df$Country %in% f),]
+income_index=li[,colSums(is.na(df))<nrow(df)]
+income_index=as.data.frame(t(income_index[,-1]))
+income_index[,3]=c(1989:2018)
+colnames(income_index)=c("Tunisia","Turkey","year")
+income_index=income_index[-1,]
+for(i in 1:3){
+income_index[,i]=as.numeric(income_index[,i])
+}
+
+```
+
+```{r}
+ggplot(income_index, aes(x=year)) + 
+   geom_line(aes(y = Tunisia), color = "red") + 
+   geom_line(aes(y = Turkey), color = "blue4")+
+  geom_point(aes(y = Tunisia), color = "red") + 
+   geom_point(aes(y = Turkey), color = "blue4")+
+   ggtitle('Income index')+
+    geom_vline(xintercept=1993.75, color = "red")+
+  geom_vline(xintercept=2000, color = "red")+
+  geom_vline(xintercept=2005, color = "red",size=0.5)+
+
+   xlab("date year")+
+   ylab("Turkey vs Tunisia")
+   
+```
+```{r}
+ggplot(education_index, aes(x=year)) + 
+   geom_line(aes(y = Tunisia), color = "red") + 
+   geom_line(aes(y = Turkey), color = "blue4")+
+   ggtitle('education index')+
+    geom_point(aes(y = Tunisia), color = "red") + 
+   geom_point(aes(y = Turkey), color = "blue4")+
+    geom_vline(xintercept=1993.75, color = "red")+
+  geom_vline(xintercept=2000, color = "red")+
+  geom_vline(xintercept=2005, color = "red",size=0.5)+
+
+   xlab("date year")+
+   ylab("Turkey vs Tunisia")
+   
+```
+
+```{r}
+ggplot(life_expectancy_index, aes(x=year)) + 
+   geom_line(aes(y = Tunisia), color = "red") + 
+   geom_line(aes(y = Turkey), color = "blue4")+
+    geom_point(aes(y = Tunisia), color = "red") + 
+   geom_point(aes(y = Turkey), color = "blue4")+
+    geom_vline(xintercept=1993.75, color = "red")+
+  geom_vline(xintercept=2000, color = "red")+
+  geom_vline(xintercept=2005, color = "red",size=0.5)+
+
+   ggtitle('Life expectancy index')+
+   xlab("date year")+
+   ylab("Turkey vs Tunisia")
+   
+```
